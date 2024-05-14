@@ -1,10 +1,11 @@
 {
-  "name": "Cell2FireWrapper",
+  "name": "cell2fire-wrapper",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "prettier": "3.2.5",
     "typescript": "^5.4.5"
   },
   "dependencies": {
