@@ -1,0 +1,17 @@
+{
+  "name": "Cell2FireWrapper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "minimist": "^1.2.8"
+  },
+  "scripts": {
+    "build": "tsc",
+    "wrapper": "tsc && node build/wrapper"
+  }
+}
