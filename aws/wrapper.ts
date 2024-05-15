@@ -27,19 +27,21 @@ if (!source.endsWith("/")) {
 mkdtemp(`${tmpDir}${sep}`, async (err, directory) => {
   if (err) throw err;
   const newArgs = { ...argv };
-  newArgs["input-instance-folder"] = directory;
+  newArgs["input-instance-folder"] = `${directory}/`;
 
   const args: string[] = [];
 
   for (const key of Object.keys(newArgs)) {
-    args.push(`--${key}=${newArgs[key]}`);
+    args.push(`--${key} ${newArgs[key]}`);
   }
+
+  console.log(`starting download ${source}`);
+  await exec(`aws s3 cp ${source} ${directory} --recursive`);
+  console.log(`downloaded ${source}`);
 
   const cmd = `Cell2Fire ${args.join(" ")}`;
   console.log({ cmd });
 
-  const s3Copy = await exec(`aws s3 cp ${source} ${directory} --recursive`);
-  console.log({ s3Copy });
 
   const output = await exec(cmd);
   console.log({ output });

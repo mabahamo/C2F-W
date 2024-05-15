@@ -11,5 +11,4 @@ COPY aws /usr/local/Cell2FireWrapper
 WORKDIR /usr/local/Cell2FireWrapper
 RUN yarn && yarn build
 
-
 ENTRYPOINT ["node", "/usr/local/Cell2FireWrapper/build/wrapper"]
