@@ -36,8 +36,8 @@ async function run(params: any) {
   const targetFolder = mkdtempSync(`${tmpDir}${sep}`) + sep;
 
   const newArgs = { ...params };
-  newArgs["input-instance-folder"] = `${sourceFolder}`;
-  newArgs["output-folder"] = `${targetFolder}`;
+  newArgs["input-instance-folder"] = sourceFolder;
+  newArgs["output-folder"] = targetFolder;
 
   const source = params["input-instance-folder"];
   const target = params["output-folder"];
@@ -58,6 +58,8 @@ async function run(params: any) {
   const output = await exec(cmd);
   console.log({ output });
 
+  //TODO: These files should be compressed before uploading to S3
+  
   console.log(`starting upload ${targetFolder} -> ${target}`);
   const ls = await exec(`ls -la ${targetFolder}`);
   console.log({ ls });
