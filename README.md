@@ -67,5 +67,5 @@ Other platform details at `.github/workflows/build\*.yml`
 
 ```
 docker build . -t cell2fire
-docker run --env-file ./env.list -it cell2fire --input-instance-folder s3://bucket_name/key/ --sim K
+docker run --env-file ./env.list -it cell2fire --input-instance-folder s3://bucket_name/key/ --sim K --output-folder s3://bucket_name/out_folder/ 
 ```
