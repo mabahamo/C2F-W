@@ -59,7 +59,7 @@ async function run(params: any) {
   console.log({ output });
 
   //TODO: These files should be compressed before uploading to S3
-  
+
   console.log(`starting upload ${targetFolder} -> ${target}`);
   const ls = await exec(`ls -la ${targetFolder}`);
   console.log({ ls });
