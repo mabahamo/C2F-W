@@ -40,8 +40,13 @@ img.fill(Qt.transparent)
 
 # Set up the painter and render the map
 painter = QPainter(img)
+
 map_settings = map_canvas.mapSettings()
 map_settings.setOutputSize(img.size())
+map_settings.setLayers([layer])
+map_settings.setExtent(layer.extent())
+map_settings.setOutputSize(QSize(800, 600))
+map_settings.setBackgroundColor(Qt.white)
 
 render = QgsMapRendererCustomPainterJob(map_settings, painter)
 render.start()

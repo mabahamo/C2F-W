@@ -54,4 +54,4 @@ RUN wget https://github.com/fire2a/fire-analytics-qgis-processing-toolbox-plugin
 RUN pip3 install --break-system-packages -r ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a/requirements.txt
 RUN qgis_process plugins enable fire2a
 
-#ENTRYPOINT ["node", "/usr/local/Cell2FireWrapper/build/wrapper"]
+ENTRYPOINT ["node", "/usr/local/Cell2FireWrapper/build/wrapper"]
