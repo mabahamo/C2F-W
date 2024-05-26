@@ -39,6 +39,35 @@ async function run(params: any) {
   newArgs["input-instance-folder"] = sourceFolder;
   newArgs["output-folder"] = targetFolder;
 
+  //enable all outputs
+  for(let i=0;i<=8;i++) {
+    newArgs["OutputOptions"] = i
+  }
+
+  /**
+   * qgis_process run fire2a:cell2firesimulator --distance_units=meters 
+   * --area_units=m2 
+   * --ellipsoid=EPSG:7030 
+   * --FuelModel=1 
+   * --FuelRaster=/Users/mabahamo/Downloads/Portezuelo/fuels.asc 
+   * --SetFuelLayerStyle=false 
+   * --ElevationRaster=/Users/mabahamo/Downloads/Portezuelo/elevation.asc 
+   * --EnableCrownFire=false 
+   * --NumberOfSimulations=2 
+   * --IgnitionMode=0 
+   * --IgnitionRadius=0 
+   * --WeatherMode=0 
+   * --WeatherFile=/Users/mabahamo/Downloads/Portezuelo/Weather.csv 
+   * --WeatherDirectory= 
+   * --FoliarMoistureContent=66 
+   * --LiveAndDeadFuelMoistureContentScenario=2 
+   * --SimulationThreads=7 
+   * --RandomNumberGeneratorSeed=123 
+   * --OutputOptions=0 --OutputOptions=1 --OutputOptions=6 --OutputOptions=2 --OutputOptions=3 --OutputOptions=4 --OutputOptions=5 --OutputOptions=7 --OutputOptions=8 
+   * --InstanceInProject=false --InstanceDirectory=TEMPORARY_OUTPUT --ResultsInInstance=true --ResultsDirectory=TEMPORARY_OUTPUT --OtherCliArgs= --DryRun=false
+   * 
+   * */
+
   const source = params["input-instance-folder"];
   const target = params["output-folder"];
 
@@ -57,6 +86,12 @@ async function run(params: any) {
 
   const output = await exec(cmd);
   console.log({ output });
+
+  const fireScarCmd = `qgis_process run fire2a:scar --distance_units=meters --area_units=m2 --ellipsoid=EPSG:7030 --BaseLayer=${sourceFolder}fuels.asc --SampleScarFile=${targetFolder}Grids/Grids1/ForestGrid0.csv --BurnProbability=TEMPORARY_OUTPUT --ScarPolygon=${targetFolder}scars.gpkg --ScarRaster=${targetFolder}scarRaster.tif`
+  console.log({fireScarCmd});
+
+  const fireScar = await exec(fireScarCmd);
+  console.log({fireScar});
 
   //TODO: These files should be compressed before uploading to S3
 

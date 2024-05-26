@@ -1,11 +1,4 @@
-FROM debian:bookworm-slim as qgis
-
-# os=ubuntu release=noble /bin/sh -c apt update && apt install -y gnupg wget software-properties-common 
-# &&     wget -qO - https://qgis.org/downloads/qgis-2022.gpg.key | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/qgis-archive.gpg --import &&    
-#  chmod a+r /etc/apt/trusted.gpg.d/qgis-archive.gpg &&     add-apt-repository "deb https://qgis.org/${os} ${release} main" &&    
-#   apt update &&     DEBIAN_FRONTEND=noninteractive 
-#   apt-get install -y python3-pip qgis python3-qgis python3-qgis-common python3-venv       python3-pytest python3-mock xvfb qttools5-dev-tools 
-#   &&     apt-get clean # buildkit
+FROM debian:bookworm-slim
 
 ENV LANG=en_EN.UTF-8
 
@@ -26,27 +19,31 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests --allow-unauthenticated -y \
         python3-pip qgis python3-qgis python3-qgis-common python3-venv python3-pytest python3-mock qttools5-dev-tools \
-        spawn-fcgi \
+        libtiff-dev g++ libboost-all-dev libeigen3-dev \
+        build-essential curl \
+        nodejs npm \
         xauth \
         xvfb \
         unzip \
-        vim \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install && rm -rf ./aws awscliv2.zip
+
+RUN npm install --global yarn
+COPY Cell2Fire /usr/local/Cell2Fire
+WORKDIR /usr/local/Cell2Fire
+RUN make clean -f makefile.debian
+RUN make install -f makefile.debian
+
+COPY aws /usr/local/Cell2FireWrapper
+WORKDIR /usr/local/Cell2FireWrapper
+RUN yarn && yarn build
 
 RUN useradd -m qgis
-
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
 
 ENV QGIS_PREFIX_PATH /usr
 ENV QGIS_SERVER_LOG_STDERR 1
 ENV QGIS_SERVER_LOG_LEVEL 2
-
-# COPY cmd.sh /home/qgis/cmd.sh
-# RUN chmod -R 777 /home/qgis/cmd.sh
-# RUN chown qgis:qgis /home/qgis/cmd.sh
 
 USER qgis
 WORKDIR /home/qgis
@@ -56,20 +53,5 @@ RUN mkdir -p ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
 RUN wget https://github.com/fire2a/fire-analytics-qgis-processing-toolbox-plugin/releases/download/v0.1.25-beta/fireanalyticstoolbox_v0.1.25-beta.zip -O ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a.zip && cd ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins && unzip fire2a.zip && rm -f fire2a.zip && mv fireanalyticstoolbox fire2a
 RUN pip3 install --break-system-packages -r ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a/requirements.txt
 RUN qgis_process plugins enable fire2a
-
-# ENTRYPOINT ["/tini", "--"]
-
-FROM alpine:3.19 as base
-RUN apk add --no-cache build-base eigen-dev boost-dev tiff-dev aws-cli
-RUN apk add nodejs npm
-RUN npm install --global yarn
-COPY Cell2Fire /usr/local/Cell2Fire
-WORKDIR /usr/local/Cell2Fire
-RUN make clean -f makefile.alpine
-RUN make install -f makefile.alpine
-
-COPY aws /usr/local/Cell2FireWrapper
-WORKDIR /usr/local/Cell2FireWrapper
-RUN yarn && yarn build
 
 ENTRYPOINT ["node", "/usr/local/Cell2FireWrapper/build/wrapper"]
