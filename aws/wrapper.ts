@@ -81,17 +81,22 @@ async function run(params: any) {
   await exec(`aws s3 cp ${source} ${sourceFolder} --recursive`);
   console.log(`downloaded ${source}`);
 
-  const cmd = `Cell2Fire ${args.join(" ")}`;
+  const cmd = `Cell2Fire --grids ${args.join(" ")}`;
   console.log({ cmd });
 
   const output = await exec(cmd);
   console.log({ output });
 
-  const fireScarCmd = `qgis_process run fire2a:scar --distance_units=meters --area_units=m2 --ellipsoid=EPSG:7030 --BaseLayer=${sourceFolder}fuels.asc --SampleScarFile=${targetFolder}Grids/Grids1/ForestGrid0.csv --BurnProbability=TEMPORARY_OUTPUT --ScarPolygon=${targetFolder}scars.gpkg --ScarRaster=${targetFolder}scarRaster.tif`
+  const scarPolygon = `${targetFolder}scars.gpkg`;
+  const fireScarCmd = `qgis_process run fire2a:scar --distance_units=meters --area_units=m2 --ellipsoid=EPSG:7030 --BaseLayer=${sourceFolder}fuels.asc --SampleScarFile=${targetFolder}Grids/Grids1/ForestGrid0.csv --BurnProbability=TEMPORARY_OUTPUT --ScarPolygon=${scarPolygon} --ScarRaster=${targetFolder}scarRaster.tif`
   console.log({fireScarCmd});
 
   const fireScar = await exec(fireScarCmd);
   console.log({fireScar});
+
+  const fireScarPngCmd = `python3 /usr/local/Cell2FireWrapper/gpkg_to_png.py ${scarPolygon} ${targetFolder}scars.png`
+  const fireScarPng = await exec(fireScarPngCmd);
+  console.log({fireScarPng});
 
   //TODO: These files should be compressed before uploading to S3
 
