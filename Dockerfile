@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim as base
 
 ENV LANG=en_EN.UTF-8
 
@@ -50,8 +50,9 @@ WORKDIR /home/qgis
 
 ENV QT_QPA_PLATFORM offscreen
 RUN mkdir -p ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
-RUN wget https://github.com/fire2a/fire-analytics-qgis-processing-toolbox-plugin/releases/download/v0.1.25-beta/fireanalyticstoolbox_v0.1.25-beta.zip -O ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a.zip && cd ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins && unzip fire2a.zip && rm -f fire2a.zip && mv fireanalyticstoolbox fire2a
+RUN wget https://github.com/fire2a/fire-analytics-qgis-processing-toolbox-plugin/releases/download/v0.1.24/fireanalyticstoolbox_v0.1.24.zip -O ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a.zip && cd ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins && unzip fire2a.zip && rm -f fire2a.zip && mv fireanalyticstoolbox fire2a
 RUN pip3 install --break-system-packages -r ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/fire2a/requirements.txt
 RUN qgis_process plugins enable fire2a
 
+FROM base as qgis
 ENTRYPOINT ["node", "/usr/local/Cell2FireWrapper/build/wrapper"]
